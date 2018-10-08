@@ -78,9 +78,12 @@ public class TextRxJava {
      */
     public void chainedRx(){
 
+
+
         // RxJava的链式操作
         Observable.create(new ObservableOnSubscribe<Integer>() {
             // 1. 创建被观察者 & 生产事件
+
             @Override
             public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {
                 emitter.onNext(1);
@@ -91,14 +94,24 @@ public class TextRxJava {
         }).subscribe(new Observer<Integer>() {
             // 2. 通过通过订阅（subscribe）连接观察者和被观察者
             // 3. 创建观察者 & 定义响应事件的行为
+
+            Disposable mDisposable;//Disposable.dispose() 切断观察者 与 被观察者 之间的连接
             @Override
             public void onSubscribe(Disposable d) {
+
+                mDisposable=d;
+
                 Log.d(TAG, "开始采用subscribe连接");
             }
             // 默认最先调用复写的 onSubscribe（）
 
             @Override
             public void onNext(Integer value) {
+
+                if (value==0){
+                    mDisposable.dispose();
+                }
+
                 Log.d(TAG, "对Next事件"+ value +"作出响应"  );
             }
 
