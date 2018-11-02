@@ -57,6 +57,53 @@ open class RxRetrofit : AppCompatActivity() {
             Observable<List<Rben>> getData();
          */
 //        intervalHttp()
+
+
+        /**
+         * 网络嵌套请求联网
+         */
+//        RetrofitUtils.getApiservice()
+//                .getData()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .doOnNext(object : Consumer<List<Rben>>{
+//                    override fun accept(t: List<Rben>?) {
+//
+//                    }
+//                })
+//                .observeOn(Schedulers.io()) // （新被观察者，同时也是新观察者）切换到IO线程去发起登录请求
+//                                            // 特别注意：因为flatMap是对初始被观察者作变换，所以对于旧被观察者，它是新观察者，所以通过observeOn切换线程
+//                                            // 但对于初始观察者，它则是新的被观察者
+//                .flatMap(object : Function<List<Rben>,ObservableSource<List<Rben>>>{
+//
+//                })
+        RetrofitUtils.getApiservice()!!
+                .data
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext {
+
+                    Log.i("doOnNext", "" +it.get(0).dyName)
+
+                }
+                .observeOn(Schedulers.io())
+                .flatMap {
+
+                    RetrofitUtils.getApiservice()!!
+                            .gc
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+
+                    Log.i("subscribe", "" +it.get(0).dyName)
+
+                }) {
+
+                    Log.i("onError", "" +it.message)
+
+                }
+
+
     }
 
     private fun intervalHttp() {

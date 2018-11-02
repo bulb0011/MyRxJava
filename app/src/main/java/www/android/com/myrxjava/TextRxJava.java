@@ -2,11 +2,21 @@ package www.android.com.myrxjava;
 
 import android.util.Log;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+import www.android.com.myrxjava.bean.Rben;
+import www.android.com.myrxjava.bean.Rben1;
+import www.android.com.myrxjava.retrofit.RetrofitUtils;
 
 /**
  * Created by sunjays on 2018/9/17.
@@ -126,6 +136,43 @@ public class TextRxJava {
             }
 
         });
+    }
+
+    Observable<List<Rben1>> observable2 = RetrofitUtils.getApiservice().getGc1();
+
+    public void nestHppt(){
+        RetrofitUtils.getApiservice()
+                .getData()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(new Consumer<List<Rben>>() {
+                    @Override
+                    public void accept(List<Rben> rbens) throws Exception {
+                        Log.i("onError", "" +rbens.get(0).getDyName());
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<List<Rben>, ObservableSource<List<Rben1>>>() {
+                    @Override
+                    public ObservableSource<List<Rben1>> apply(List<Rben> rbens) throws Exception {
+
+                        return observable2;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Rben1>>() {
+                    @Override
+                    public void accept(List<Rben1> rben1s) throws Exception {
+                        Log.i("accept", "" + rben1s.get(0).getDyName());
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.i("accept", "" + throwable.getMessage());
+                    }
+                });
+
+
     }
 
 }
